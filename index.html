@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palpite — Brasil na Copa</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #009C3B;
+    --yellow: #FFDF00;
+    --blue:   #002776;
+    --white:  #FFFFFF;
+    --bg:     #F4F6F2;
+    --surface: #FFFFFF;
+    --border: #E0E4DC;
+    --text:   #1A1F16;
+    --muted:  #6B7268;
+    --danger: #C0392B;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 60px;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    width: 100%;
+    max-width: 540px;
+    background: var(--blue);
+    border-radius: 0 0 24px 24px;
+    padding: 36px 32px 28px;
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      135deg,
+      transparent,
+      transparent 18px,
+      rgba(255,223,0,0.04) 18px,
+      rgba(255,223,0,0.04) 36px
+    );
+  }
+  .hero-flag {
+    font-size: 52px;
+    line-height: 1;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .hero-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .hero-subtitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    position: relative;
+  }
+  .hero-teams {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+    position: relative;
+  }
+  .hero-team {
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-team strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .vs-badge {
+    background: var(--yellow);
+    color: var(--blue);
+    font-weight: 700;
+    font-size: 13px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    width: 100%;
+    max-width: 540px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ─── FIELDS ─── */
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  label span.req { color: var(--green); margin-left: 2px; }
+
+  input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--bg);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  input[type="text"]:focus, input[type="tel"]:focus {
+    border-color: var(--green);
+    background: #fff;
+  }
+  input.error {
+    border-color: var(--danger);
+  }
+  .field-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ─── PLACAR ─── */
+  .placar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .placar-time {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .placar-input-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .placar-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  input.num {
+    width: 68px;
+    height: 68px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    padding: 0;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  input.num::-webkit-outer-spin-button,
+  input.num::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input.num:focus { border-color: var(--green); background: #fff; }
+  input.num.error { border-color: var(--danger); }
+
+  .placar-sep {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--blue);
+    padding-top: 18px;
+  }
+
+  /* ─── GOLS ─── */
+  .gols-area {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .gols-area.visible { display: flex; }
+  .gols-area-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot.bra { background: var(--green); }
+  .dot.adv { background: var(--blue); }
+
+  .goleiro-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .goleiro-row input {
+    flex: 1;
+  }
+  .goleiro-row .btn-remove {
+    width: 34px;
+    height: 38px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: background 0.1s, color 0.1s;
+  }
+  .goleiro-row .btn-remove:hover { background: #fef2f2; color: var(--danger); border-color: var(--danger); }
+
+  .btn-add {
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    font-family: inherit;
+    transition: border-color 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .btn-add:hover { border-color: var(--green); color: var(--green); }
+
+  /* ─── SECTION DIVIDER ─── */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 4px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::before {
+    content: '';
+    width: 10px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+  }
+
+  /* ─── SUBMIT ─── */
+  .btn-submit {
+    width: 100%;
+    max-width: 540px;
+    padding: 16px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .btn-submit:hover { background: #007A2E; }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit:disabled { background: #9EC89E; cursor: not-allowed; }
+
+  /* ─── ERROR BOX ─── */
+  .error-box {
+    display: none;
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-bottom: 12px;
+    width: 100%;
+    max-width: 540px;
+  }
+  .error-box.visible { display: block; }
+
+  /* ─── SUCCESS ─── */
+  .success-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 48px 24px;
+    width: 100%;
+    max-width: 540px;
+  }
+  .success-screen.visible { display: flex; }
+  .success-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #E8F5EE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  .success-screen h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 10px;
+  }
+  .success-screen p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 340px;
+  }
+  .success-palpite {
+    background: var(--blue);
+    color: #fff;
+    border-radius: 12px;
+    padding: 20px 32px;
+    margin: 24px 0 0;
+    font-size: 13px;
+  }
+  .success-palpite .score {
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    color: var(--yellow);
+    display: block;
+    margin: 6px 0;
+  }
+
+  /* ─── SPINNER ─── */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text { display: none; }
+  .btn-submit.loading .loading-text { display: flex; align-items: center; gap: 8px; }
+  .btn-submit.loading .default-text { display: none; }
+
+  @media (max-width: 480px) {
+    .card { padding: 22px 18px; }
+    .hero { padding: 28px 20px 22px; border-radius: 0 0 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-flag">🇧🇷</div>
+  <div class="hero-title">Copa do Mundo 2026</div>
+  <div class="hero-subtitle">Qual é o seu palpite?</div>
+  <div class="hero-teams">
+    <div class="hero-team"><strong>BRA</strong>Brasil</div>
+    <div class="vs-badge">×</div>
+    <div class="hero-team"><strong id="adv-abbr">ADV</strong><span id="adv-name">Adversário</span></div>
+  </div>
+</div>
+
+<!-- FORM (oculto na tela de sucesso) -->
+<div id="form-wrapper" style="width:100%;max-width:540px;display:flex;flex-direction:column;align-items:center;">
+
+  <!-- Identificação -->
+  <div class="card">
+    <div class="card-title">Identificação</div>
+
+    <div class="field">
+      <label for="nome">Seu nome completo<span class="req">*</span></label>
+      <input type="text" id="nome" placeholder="Ex.: João da Silva" autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label for="cpf">CPF (sem pontos ou traço)<span class="req">*</span></label>
+      <input type="tel" id="cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
+      <div class="field-hint">Usado apenas para evitar respostas duplicadas.</div>
+    </div>
+  </div>
+
+  <!-- Placar -->
+  <div class="card">
+    <div class="card-title">Placar final</div>
+
+    <div class="placar">
+      <div class="placar-time">🇧🇷 Brasil</div>
+      <div class="placar-input-wrap">
+        <div class="placar-label">Gols</div>
+        <input type="number" class="num" id="gols-bra" min="0" max="30" value="" placeholder="0" oninput="onPlacarChange()">
+      </div>
+      <div class="placar-sep">×</div>
+      <div class="placar-input-wrap">
+        <div class="placar-label">Gols</div>
+        <input type="number" class="num" id="gols-adv" min="0" max="30" value="" placeholder="0" oninput="onPlacarChange()">
+      </div>
+      <div class="placar-time" id="adv-placar-label">🏴 Adversário</div>
+    </div>
+
+    <!-- Gols do Brasil -->
+    <div class="gols-area" id="gols-bra-area">
+      <div class="gols-area-title"><span class="dot bra"></span> Autores dos gols do Brasil</div>
+      <div id="lista-gols-bra"></div>
+      <button class="btn-add" onclick="addGol('bra')">+ Adicionar marcador</button>
+    </div>
+
+    <!-- Gols do Adversário -->
+    <div class="gols-area" id="gols-adv-area">
+      <div class="gols-area-title"><span class="dot adv"></span> Autores dos gols do adversário</div>
+      <div id="lista-gols-adv"></div>
+      <button class="btn-add" onclick="addGol('adv')">+ Adicionar marcador</button>
+    </div>
+  </div>
+
+  <!-- Erro -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- Enviar -->
+  <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+    <span class="default-text">⚽ Enviar palpite</span>
+    <span class="loading-text"><span class="spinner"></span> Enviando…</span>
+  </button>
+
+  <div style="font-size:11px;color:#9CA899;text-align:center;max-width:360px;line-height:1.6;">
+    Cada CPF pode enviar apenas um palpite. Seus dados não serão compartilhados.
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">✅</div>
+  <h2>Palpite enviado!</h2>
+  <p>Seu palpite foi registrado com sucesso. Boa sorte — e vai, Brasil! 🇧🇷</p>
+  <div class="success-palpite">
+    <div style="font-size:12px;color:rgba(255,255,255,0.65);letter-spacing:0.08em;text-transform:uppercase;">Seu palpite</div>
+    <span class="score" id="success-score">— × —</span>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);" id="success-marcadores"></div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+// Cole aqui a URL do seu Apps Script depois de publicar
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwC_NY-nYIXzQkLEmyHPwzqZXHXroxuOUptZGiE2ajbqiONYIPwHb5cGFcxJ1_KxMuTAA/exec';
+
+// Personalize o adversário
+const ADVERSARIO = { nome: 'Haiti', abbr: 'HAI', flag: '🇭🇹' };
+// ─────────────────────────────────────────────────────────────────────────────
+
+document.getElementById('adv-name').textContent = ADVERSARIO.nome;
+document.getElementById('adv-abbr').textContent = ADVERSARIO.abbr;
+document.getElementById('adv-placar-label').textContent = ADVERSARIO.flag + ' ' + ADVERSARIO.nome;
+
+const gols = { bra: [], adv: [] };
+let gol_id = 0;
+
+function onPlacarChange() {
+  const vBra = parseInt(document.getElementById('gols-bra').value) || 0;
+  const vAdv = parseInt(document.getElementById('gols-adv').value) || 0;
+
+  const areaBra = document.getElementById('gols-bra-area');
+  const areaAdv = document.getElementById('gols-adv-area');
+
+  if (vBra > 0) { areaBra.classList.add('visible'); syncGolInputs('bra', vBra); }
+  else { areaBra.classList.remove('visible'); gols.bra = []; renderGols('bra'); }
+
+  if (vAdv > 0) { areaAdv.classList.add('visible'); syncGolInputs('adv', vAdv); }
+  else { areaAdv.classList.remove('visible'); gols.adv = []; renderGols('adv'); }
+}
+
+function syncGolInputs(team, count) {
+  while (gols[team].length < count) { gols[team].push({ id: gol_id++, val: '' }); }
+  while (gols[team].length > count) { gols[team].pop(); }
+  renderGols(team);
+}
+
+function renderGols(team) {
+  const container = document.getElementById('lista-gols-' + team);
+  container.innerHTML = '';
+  gols[team].forEach((g, i) => {
+    const row = document.createElement('div');
+    row.className = 'goleiro-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Nome do marcador (gol ${i + 1})" value="${escHtml(g.val)}"
+             oninput="gols['${team}'][${i}].val = this.value">
+      <button class="btn-remove" onclick="removeGol('${team}', ${i})" title="Remover">✕</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function addGol(team) {
+  gols[team].push({ id: gol_id++, val: '' });
+  renderGols(team);
+}
+
+function removeGol(team, idx) {
+  gols[team].splice(idx, 1);
+  renderGols(team);
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.textContent = msg;
+  box.classList.add('visible');
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearError() {
+  document.getElementById('error-box').classList.remove('visible');
+}
+
+function cpfValido(cpf) {
+  cpf = cpf.replace(/\D/g, '');
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  let s = 0, r;
+  for (let i = 0; i < 9; i++) s += parseInt(cpf[i]) * (10 - i);
+  r = (s * 10) % 11; if (r === 10 || r === 11) r = 0;
+  if (r !== parseInt(cpf[9])) return false;
+  s = 0;
+  for (let i = 0; i < 10; i++) s += parseInt(cpf[i]) * (11 - i);
+  r = (s * 10) % 11; if (r === 10 || r === 11) r = 0;
+  return r === parseInt(cpf[10]);
+}
+
+async function submitForm() {
+  clearError();
+
+  const nome = document.getElementById('nome').value.trim();
+  const cpf  = document.getElementById('cpf').value.replace(/\D/g, '');
+  const vBra = document.getElementById('gols-bra').value;
+  const vAdv = document.getElementById('gols-adv').value;
+
+  // Validações
+  if (!nome) { document.getElementById('nome').classList.add('error'); return showError('Por favor, informe seu nome completo.'); }
+  document.getElementById('nome').classList.remove('error');
+
+  if (!cpfValido(cpf)) { document.getElementById('cpf').classList.add('error'); return showError('CPF inválido. Informe os 11 dígitos sem pontos ou traço.'); }
+  document.getElementById('cpf').classList.remove('error');
+
+  if (vBra === '' || vAdv === '') { return showError('Informe o placar completo (pode ser 0 × 0).'); }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  const marcadoresBra = gols.bra.map(g => g.val.trim()).filter(Boolean);
+  const marcadoresAdv = gols.adv.map(g => g.val.trim()).filter(Boolean);
+
+  const payload = {
+    nome,
+    cpf,
+    placar_brasil: parseInt(vBra),
+    placar_adversario: parseInt(vAdv),
+    adversario: ADVERSARIO.nome,
+    marcadores_brasil: marcadoresBra.join(', '),
+    marcadores_adversario: marcadoresAdv.join(', '),
+  };
+
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      document.getElementById('form-wrapper').style.display = 'none';
+      document.querySelector('.hero').style.display = 'none';
+
+      const ss = document.getElementById('success-screen');
+      ss.classList.add('visible');
+      document.getElementById('success-score').textContent = `${vBra} × ${vAdv}`;
+
+      const parts = [];
+      if (marcadoresBra.length) parts.push('🇧🇷 ' + marcadoresBra.join(', '));
+      if (marcadoresAdv.length) parts.push(ADVERSARIO.flag + ' ' + marcadoresAdv.join(', '));
+      document.getElementById('success-marcadores').textContent = parts.join(' | ') || 'Sem gols marcados.';
+
+    } else if (data.status === 'duplicate') {
+      showError('Este CPF já enviou um palpite. Cada pessoa pode responder apenas uma vez.');
+    } else {
+      showError('Algo deu errado: ' + (data.message || 'tente novamente.'));
+    }
+  } catch (e) {
+    showError('Erro de conexão. Verifique sua internet e tente novamente.');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+// Máscara de CPF (só números)
+document.getElementById('cpf').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 11);
+});
+</script>
+</body>
+</html>
