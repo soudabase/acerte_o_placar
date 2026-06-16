@@ -148,6 +148,14 @@
     min-width: 24px; text-align: center;
   }
   .chip.selected .chip-badge { display: inline-block; }
+  .chip-minus {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(255,255,255,.25); font-size: 14px; font-weight: 700;
+    line-height: 1; cursor: pointer; flex-shrink: 0;
+    transition: background .12s;
+  }
+  .chip-minus:hover { background: rgba(255,255,255,.45); }
   .chips-hint { font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
 
   /* ── CHIPS (Haiti — azul) ── */
@@ -358,14 +366,26 @@ function renderChips(team) {
       const nameSpan = document.createElement('span');
       nameSpan.textContent = nome;
 
+      const right = document.createElement('span');
+      right.style.cssText = 'display:flex;align-items:center;gap:4px;flex-shrink:0;';
+
       const badge = document.createElement('span');
       badge.className = 'chip-badge';
       badge.textContent = c + '×';
+      right.appendChild(badge);
+
+      if (c > 0) {
+        const minus = document.createElement('span');
+        minus.className = 'chip-minus';
+        minus.textContent = '−';
+        minus.onclick = (e) => { e.stopPropagation(); removeChip(team, nome); };
+        right.appendChild(minus);
+      }
 
       btn.appendChild(nameSpan);
-      btn.appendChild(badge);
+      btn.appendChild(right);
 
-      btn.onclick = () => toggleChip(team, nome, maxGols);
+      btn.onclick = () => addChip(team, nome, maxGols);
       grid.appendChild(btn);
     });
 
@@ -374,16 +394,17 @@ function renderChips(team) {
   });
 }
 
-function toggleChip(team, nome, maxGols) {
-  const c     = counts[team][nome] || 0;
+function addChip(team, nome, maxGols) {
   const total = Object.values(counts[team]).reduce((a, b) => a + b, 0);
-  if (c > 0) {
-    counts[team][nome] = c - 1;
-    if (counts[team][nome] === 0) delete counts[team][nome];
-  } else {
-    if (total >= maxGols) return; // já atingiu o limite de gols
-    counts[team][nome] = 1;
-  }
+  if (total >= maxGols) return;
+  counts[team][nome] = (counts[team][nome] || 0) + 1;
+  renderChips(team);
+}
+
+function removeChip(team, nome) {
+  if (!counts[team][nome]) return;
+  counts[team][nome]--;
+  if (counts[team][nome] === 0) delete counts[team][nome];
   renderChips(team);
 }
 
