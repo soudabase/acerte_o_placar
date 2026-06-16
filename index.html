@@ -132,35 +132,43 @@
     gap: 6px;
   }
   .chip {
-    padding: 9px 12px;
+    padding: 7px 10px;
     border: 1.5px solid var(--border); border-radius: 8px;
     font-size: 13px; font-weight: 500; font-family: inherit;
     color: var(--text); background: var(--bg);
-    cursor: pointer; transition: all .12s;
+    cursor: default; transition: border-color .12s, background .12s;
     user-select: none; text-align: left;
-    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
-  .chip:hover { border-color: var(--green); color: var(--green); background: #f0faf4; }
-  .chip.selected { background: var(--green); border-color: var(--green); color: #fff; }
-  .chip-badge {
-    display: none; background: rgba(255,255,255,.32); border-radius: 999px;
-    font-size: 11px; font-weight: 700; padding: 1px 7px; flex-shrink: 0;
-    min-width: 24px; text-align: center;
+  .chip.selected { background: #f0faf4; border-color: var(--green); }
+  .chip.adv-chip.selected { background: #eef0fb; border-color: #00209F; }
+  .chip-name { flex: 1; font-size: 13px; font-weight: 500; }
+  .chip-controls {
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
   }
-  .chip.selected .chip-badge { display: inline-block; }
-  .chip-minus {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: rgba(255,255,255,.25); font-size: 14px; font-weight: 700;
-    line-height: 1; cursor: pointer; flex-shrink: 0;
-    transition: background .12s;
+  .chip-btn {
+    width: 26px; height: 26px; border-radius: 6px;
+    border: 1.5px solid var(--border); background: var(--surface);
+    font-size: 16px; font-weight: 700; line-height: 1;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text); transition: background .1s, border-color .1s, color .1s;
+    flex-shrink: 0;
   }
-  .chip-minus:hover { background: rgba(255,255,255,.45); }
+  .chip-btn:hover { background: var(--bg); border-color: var(--muted); }
+  .chip-btn.plus { border-color: var(--green); color: var(--green); }
+  .chip-btn.plus:hover { background: var(--green); color: #fff; }
+  .chip-btn.minus { border-color: var(--border); color: var(--muted); }
+  .chip-btn.minus:hover { border-color: var(--danger); color: var(--danger); background: #fef2f2; }
+  .chip-adv .chip-btn.plus { border-color: #00209F; color: #00209F; }
+  .chip-adv .chip-btn.plus:hover { background: #00209F; color: #fff; }
+  .chip-count {
+    font-size: 14px; font-weight: 700; min-width: 18px; text-align: center;
+    color: var(--text);
+  }
+  .chip.selected .chip-count { color: var(--green); }
+  .chip.adv-chip.selected .chip-count { color: #00209F; }
   .chips-hint { font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
 
-  /* ── CHIPS (Haiti — azul) ── */
-  .chip.adv-chip:hover { border-color: #00209F; color: #00209F; background: #eef0fb; }
-  .chip.adv-chip.selected { background: #00209F; border-color: #00209F; color: #fff; }
 
   /* ── ROW de gol (texto livre, não usado agora) ── */
   .adv-gol-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
@@ -363,29 +371,43 @@ function renderChips(team) {
       btn.type = 'button';
       btn.className = 'chip' + (isAdv ? ' adv-chip' : '') + (c > 0 ? ' selected' : '');
 
-      const nameSpan = document.createElement('span');
-      nameSpan.textContent = nome;
+      if (isAdv) btn.classList.add('chip-adv');
 
-      const right = document.createElement('span');
-      right.style.cssText = 'display:flex;align-items:center;gap:4px;flex-shrink:0;';
+      const nameSpan2 = document.createElement('span');
+      nameSpan2.className = 'chip-name';
+      nameSpan2.textContent = nome;
 
-      const badge = document.createElement('span');
-      badge.className = 'chip-badge';
-      badge.textContent = c + '×';
-      right.appendChild(badge);
+      const controls = document.createElement('span');
+      controls.className = 'chip-controls';
 
-      if (c > 0) {
-        const minus = document.createElement('span');
-        minus.className = 'chip-minus';
-        minus.textContent = '−';
-        minus.onclick = (e) => { e.stopPropagation(); removeChip(team, nome); };
-        right.appendChild(minus);
-      }
+      const minusBtn = document.createElement('button');
+      minusBtn.type = 'button';
+      minusBtn.className = 'chip-btn minus';
+      minusBtn.textContent = '−';
+      minusBtn.disabled = c === 0;
+      minusBtn.style.opacity = c === 0 ? '0.3' : '1';
+      minusBtn.onclick = (e) => { e.stopPropagation(); removeChip(team, nome); };
 
-      btn.appendChild(nameSpan);
-      btn.appendChild(right);
+      const countSpan = document.createElement('span');
+      countSpan.className = 'chip-count';
+      countSpan.textContent = c;
 
-      btn.onclick = () => addChip(team, nome, maxGols);
+      const plusBtn = document.createElement('button');
+      plusBtn.type = 'button';
+      plusBtn.className = 'chip-btn plus';
+      plusBtn.textContent = '+';
+      const reachedMax = Object.values(counts[team]).reduce((a,b)=>a+b,0) >= maxGols;
+      plusBtn.disabled = reachedMax;
+      plusBtn.style.opacity = reachedMax ? '0.3' : '1';
+      plusBtn.onclick = (e) => { e.stopPropagation(); addChip(team, nome, maxGols); };
+
+      controls.appendChild(minusBtn);
+      controls.appendChild(countSpan);
+      controls.appendChild(plusBtn);
+
+      btn.appendChild(nameSpan2);
+      btn.appendChild(controls);
+
       grid.appendChild(btn);
     });
 
