@@ -563,7 +563,7 @@ async function submitForm() {
         document.getElementById('form-wrapper').style.display = 'none';
         document.querySelector('.hero').style.display = 'none';
         document.getElementById('success-screen').classList.add('visible');
-        document.getElementById('success-score').textContent = `${vBra} × ${vAdv}`;
+        document.getElementById('success-score').textContent = `${parseInt(vBra)||0} × ${parseInt(vAdv)||0}`;
         const parts = [];
         if (marcadoresBra.length) parts.push('🇧🇷 ' + marcadoresBra.join(', '));
         if (marcadoresAdv.length) parts.push(ADVERSARIO.flag + ' ' + marcadoresAdv.join(', '));
