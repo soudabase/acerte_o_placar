@@ -521,7 +521,7 @@ async function submitForm() {
   document.getElementById('nome').classList.remove('error');
   if (!cpfValido(cpf)) { document.getElementById('cpf').classList.add('error'); return showError('CPF inválido. Informe os 11 dígitos sem pontos ou traço.'); }
   document.getElementById('cpf').classList.remove('error');
-  if (vBra === '' || vAdv === '') return showError('Informe o placar completo (pode ser 0 × 0).');
+  // placar vazio = 0
 
   const marcadoresBra = expandCounts(counts.bra);
   const marcadoresAdv = expandCounts(counts.adv);
@@ -531,8 +531,8 @@ async function submitForm() {
 
   const payload = {
     nome, cpf,
-    placar_brasil: parseInt(vBra),
-    placar_adversario: parseInt(vAdv),
+    placar_brasil: parseInt(vBra) || 0,
+    placar_adversario: parseInt(vAdv) || 0,
     adversario: ADVERSARIO.nome,
     marcadores_brasil: marcadoresBra.join(', '),
     marcadores_adversario: marcadoresAdv.join(', '),
